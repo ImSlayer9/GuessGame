@@ -25,15 +25,14 @@ canvas{
   z-index:0;
 }
 
-/* Glass Card */
+/* Card */
 .container{
   width:380px;
   padding:25px;
   border-radius:20px;
-  backdrop-filter:blur(15px);
-  background:rgba(255,255,255,0.05);
+  background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.1);
-  box-shadow:0 0 40px rgba(255,255,255,0.08);
+  backdrop-filter:blur(10px);
   text-align:center;
   z-index:2;
 }
@@ -42,7 +41,6 @@ canvas{
 h1{
   color:#fff;
   margin-bottom:15px;
-  letter-spacing:1px;
 }
 
 /* Display */
@@ -51,9 +49,34 @@ h1{
   border-radius:12px;
   font-size:28px;
   background:#111;
-  margin-bottom:12px;
   border:1px solid #333;
-  color:#fff;
+  color:#aaa;
+  margin-bottom:10px;
+}
+
+/* Chances */
+.chances{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.box{
+  width:30px;
+  height:30px;
+  border-radius:8px;
+  background:#111;
+  border:1px solid #333;
+}
+
+.box.wrong{
+  background:#ff0033;
+  box-shadow:0 0 10px #ff0033;
+}
+
+.box.correct{
+  background:#00ff99;
+  box-shadow:0 0 10px #00ff99;
 }
 
 /* Buttons */
@@ -61,17 +84,18 @@ h1{
   width:100%;
   padding:12px;
   margin:6px 0;
-  border:none;
   border-radius:12px;
-  background:#1f1f1f;
-  color:#fff;
+  border:none;
+  background:#fff;
+  color:#000;
+  font-weight:bold;
   cursor:pointer;
   transition:0.25s;
 }
+
 .btn:hover{
-  background:#fff;
-  color:#000;
-  transform:scale(1.03);
+  transform:scale(1.05);
+  box-shadow:0 0 10px #fff;
 }
 
 /* Keypad */
@@ -84,19 +108,17 @@ h1{
 
 .key{
   padding:18px;
-  border-radius:15px;
-  font-size:18px;
-  background:#111;
-  border:1px solid #333;
+  border-radius:12px;
+  background:#fff;
+  color:#000;
+  font-weight:bold;
   cursor:pointer;
   transition:0.25s;
 }
 
 .key:hover{
-  background:#fff;
-  color:#000;
   transform:scale(1.1);
-  box-shadow:0 0 10px rgba(255,255,255,0.4);
+  box-shadow:0 0 10px #fff;
 }
 
 /* Message */
@@ -115,14 +137,12 @@ h1{
   justify-content:center;
   align-items:center;
   background:rgba(0,0,0,0.85);
-  z-index:5;
 }
 
 .popup-box{
   background:#111;
   padding:25px;
   border-radius:15px;
-  text-align:center;
 }
 
 /* Shake */
@@ -144,7 +164,17 @@ h1{
 <div class="container" id="game">
   <h1>TROLL GUESS 😈</h1>
 
-  <div class="display" id="display">ENTER NUMBER</div>
+  <div class="display" id="display">TRY ME</div>
+
+  <div class="chances">
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+  </div>
 
   <button class="btn" onclick="checkGuess()">TRY YOUR LUCK</button>
   <button class="btn" onclick="resetGame()">RAGE QUIT 😂</button>
@@ -176,70 +206,55 @@ h1{
 <audio id="laugh" src="https://www.soundjay.com/human/laugh-01.mp3"></audio>
 
 <script>
-/* ===== PREMIUM GRADIENT GLOW TRAIL ===== */
+/* Gradient Trail */
 const canvas = document.getElementById("trailCanvas");
 const ctx = canvas.getContext("2d");
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let points = [];
+let points=[];
 
-document.addEventListener("mousemove", (e) => {
-  points.push({ x: e.clientX, y: e.clientY, life: 1 });
-  if (points.length > 60) points.shift();
+document.addEventListener("mousemove",e=>{
+  points.push({x:e.clientX,y:e.clientY,life:1});
+  if(points.length>60)points.shift();
 });
 
-function drawTrail() {
-  ctx.fillStyle = "rgba(0,0,0,0.12)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+function draw(){
+  ctx.fillStyle="rgba(0,0,0,0.12)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
+  ctx.lineCap="round";
 
-  for (let i = 0; i < points.length - 1; i++) {
-    let p1 = points[i];
-    let p2 = points[i + 1];
+  for(let i=0;i<points.length-1;i++){
+    let p1=points[i],p2=points[i+1];
+    p1.life*=0.96;
 
-    p1.life *= 0.96;
-    let alpha = p1.life;
+    let g=ctx.createLinearGradient(p1.x,p1.y,p2.x,p2.y);
+    g.addColorStop(0,`rgba(0,255,255,${p1.life})`);
+    g.addColorStop(0.5,`rgba(180,0,255,${p1.life})`);
+    g.addColorStop(1,`rgba(255,0,120,${p1.life})`);
 
-    let gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-    gradient.addColorStop(0, `rgba(0,255,255,${alpha})`);
-    gradient.addColorStop(0.5, `rgba(180,0,255,${alpha})`);
-    gradient.addColorStop(1, `rgba(255,0,120,${alpha})`);
+    ctx.strokeStyle=g;
+    ctx.lineWidth=6*p1.life;
+    ctx.shadowBlur=18;
+    ctx.shadowColor="rgba(255,0,200,0.8)";
 
     ctx.beginPath();
-    ctx.strokeStyle = gradient;
-
-    ctx.shadowBlur = 18;
-    ctx.shadowColor = "rgba(255,0,200,0.8)";
-
-    ctx.lineWidth = 6 * alpha;
-
-    let midX = (p1.x + p2.x) / 2;
-    let midY = (p1.y + p2.y) / 2;
-
-    ctx.moveTo(p1.x, p1.y);
-    ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+    ctx.moveTo(p1.x,p1.y);
+    ctx.lineTo(p2.x,p2.y);
     ctx.stroke();
   }
 
-  points = points.filter(p => p.life > 0.05);
-  requestAnimationFrame(drawTrail);
+  points=points.filter(p=>p.life>0.05);
+  requestAnimationFrame(draw);
 }
+draw();
 
-drawTrail();
-
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
-
-/* ===== GAME LOGIC ===== */
+/* Game */
 let number=Math.floor(Math.random()*99)+1;
 let input="";
 let chances=7;
+let index=0;
 
 function add(d){
   if(input.length<2){
@@ -248,10 +263,7 @@ function add(d){
   }
 }
 
-function clearInput(){
-  input="";
-  update();
-}
+function clearInput(){input="";update();}
 
 function update(){
   document.getElementById("display").innerText=input||"TRY ME";
@@ -260,7 +272,7 @@ function update(){
 function checkGuess(){
   let n=parseInt(input);
   let msg=document.getElementById("message");
-  let game=document.getElementById("game");
+  let boxes=document.querySelectorAll(".box");
 
   if(!n||n<1||n>99){
     msg.innerText="Enter valid number 🤦";
@@ -270,18 +282,19 @@ function checkGuess(){
   chances--;
 
   if(n===number){
+    boxes[index].classList.add("correct");
     showPopup("You won... somehow 😒");
     return;
   }
+
+  boxes[index].classList.add("wrong");
+  index++;
 
   msg.innerText = n<number
     ? "Too LOW 😂 go higher"
     : "Too HIGH 🤡 come down";
 
   document.getElementById("laugh").play();
-
-  game.classList.add("shake");
-  setTimeout(()=>game.classList.remove("shake"),300);
 
   if(chances===0){
     showPopup("Game Over 🤡 Number was "+number);
@@ -305,11 +318,13 @@ function resetGame(){
   number=Math.floor(Math.random()*99)+1;
   input="";
   chances=7;
+  index=0;
   document.getElementById("message").innerText="";
+  document.querySelectorAll(".box").forEach(b=>{
+    b.classList.remove("wrong","correct");
+  });
   update();
 }
-
-update();
 </script>
 
 </body>
