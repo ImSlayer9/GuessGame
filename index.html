@@ -3,212 +3,315 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guess The Number</title>
+<title>Troll Guess 😈</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Courier New",monospace}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
 
 body{
-height:100vh;display:flex;justify-content:center;align-items:center;
-background:#000;color:#00ff9c;
-overflow:hidden;
+  height:100vh;
+  background:radial-gradient(circle at top,#1a1a1a,#000);
+  color:white;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* subtle scanline effect */
-body::before{
-content:"";position:absolute;width:100%;height:100%;
-background:repeating-linear-gradient(
-  to bottom,
-  rgba(0,255,0,0.05),
-  rgba(0,255,0,0.05) 1px,
-  transparent 1px,
-  transparent 3px
-);
-pointer-events:none;
+/* ===== Floating Birds ===== */
+.bird{
+  position:absolute;
+  font-size:24px;
+  opacity:0.7;
+  animation:flyRight linear infinite;
 }
 
+.bird.reverse{
+  animation:flyLeft linear infinite;
+}
+
+@keyframes flyRight{
+  from{transform:translateX(-10vw)}
+  to{transform:translateX(110vw)}
+}
+
+@keyframes flyLeft{
+  from{transform:translateX(110vw)}
+  to{transform:translateX(-10vw)}
+}
+
+/* ===== Main Card ===== */
 .container{
-background:#020202;padding:25px;border-radius:10px;width:95%;max-width:400px;
-text-align:center;border:1px solid #00ff9c;
-box-shadow:0 0 20px #00ff9c;
+  width:380px;
+  padding:25px;
+  border-radius:20px;
+  backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 0 40px rgba(255,0,80,0.2);
+  text-align:center;
+  z-index:2;
 }
 
-h1{margin-bottom:10px;font-size:22px;text-shadow:0 0 8px #00ff9c}
-p{margin-bottom:15px;color:#00cc7a}
-
-input{
-width:100%;padding:12px;margin-bottom:10px;border-radius:6px;
-border:1px solid #00ff9c;font-size:20px;text-align:center;
-background:#000;color:#00ff9c;
-box-shadow:0 0 10px #00ff9c inset;
+/* Title */
+h1{
+  font-size:26px;
+  color:#ff4d6d;
+  margin-bottom:15px;
+  letter-spacing:1px;
 }
 
-button{border:none;border-radius:6px;cursor:pointer;transition:.2s;font-family:inherit}
-
-.submit-btn{
-width:100%;padding:10px;background:#001a0f;color:#00ff9c;font-size:14px;margin-bottom:10px;
-border:1px solid #00ff9c;box-shadow:0 0 10px #00ff9c;
+/* Display */
+.display{
+  padding:18px;
+  border-radius:12px;
+  font-size:28px;
+  margin-bottom:12px;
+  background:rgba(0,0,0,0.6);
+  border:1px solid rgba(255,77,109,0.5);
 }
-.submit-btn:hover{background:#003322}
 
-.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+/* Buttons */
+.btn{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(45deg,#ff4d6d,#ff1e4d);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 15px #ff4d6d;
+}
+
+/* Keypad */
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:15px;
+}
 
 .key{
-padding:12px;font-size:16px;background:#000;color:#00ff9c;
-border:1px solid #00ff9c;border-radius:6px;
+  padding:15px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  cursor:pointer;
+  transition:0.2s;
 }
 
-.key:hover{background:#002b1a}
-.key:active{transform:scale(.9)}
-
-.wide{grid-column:span 2}
-
-.chance-boxes{display:flex;justify-content:space-between;margin-top:15px}
-
-.box{
-width:32px;height:32px;border-radius:4px;background:#000;
-display:flex;justify-content:center;align-items:center;
-font-weight:bold;font-size:14px;
-border:1px solid #00ff9c;
+.key:hover{
+  background:#ff4d6d;
 }
 
-.box.active{box-shadow:0 0 10px #00ff9c}
-.box.wrong{background:#330000;color:#ff4d4d}
-.box.correct{background:#003322;color:#00ff9c}
-
-.message{margin-top:12px;font-weight:bold;font-size:14px}
-.hint{font-size:22px;font-weight:900;animation:blink .5s alternate infinite}
-
-@keyframes blink{from{opacity:.5}to{opacity:1}}
-
-.success{color:#00ff9c}
-.error{color:#ff4d4d}
-
-.modal{
-position:fixed;inset:0;display:flex;justify-content:center;align-items:center;
-background:rgba(0,0,0,.9);opacity:0;pointer-events:none;transition:.2s
+/* Message */
+.message{
+  margin-top:12px;
+  min-height:40px;
+  font-size:14px;
+  color:#ffb3c1;
 }
 
-.modal.show{opacity:1;pointer-events:auto}
-
-.modal-content{
-background:#000;padding:20px;border-radius:10px;text-align:center;
-border:1px solid #00ff9c;box-shadow:0 0 20px #00ff9c;
-animation:scaleIn .3s
+/* Popup */
+.popup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.8);
+  z-index:5;
 }
 
-@keyframes scaleIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
-
-.close-btn{
-padding:8px 16px;background:#001a0f;border:1px solid #00ff9c;color:#00ff9c;
+.popup-box{
+  background:#111;
+  padding:30px;
+  border-radius:15px;
+  text-align:center;
+  animation:pop 0.3s ease;
 }
 
-.play-again-btn{
-margin-top:15px;width:100%;padding:12px;font-size:16px;
-color:#000;background:#00ff9c;border-radius:6px;font-weight:bold;
-box-shadow:0 0 15px #00ff9c;
+@keyframes pop{
+  from{transform:scale(0.7);opacity:0}
+  to{transform:scale(1);opacity:1}
 }
 
-.play-again-btn:hover{background:#00cc7a}
+/* Shake */
+.shake{
+  animation:shake 0.3s;
+}
 
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-6px)}
+  100%{transform:translateX(0)}
+}
 </style>
 </head>
+
 <body>
-<div class="container">
-<h1>🧠 SYSTEM BREACH: GUESS PROTOCOL</h1>
-<p>Enter value between 1 - 99</p>
-<input id="guessInput" placeholder="INPUT VALUE" readonly>
-<button class="submit-btn" id="submitBtn">EXECUTE</button>
-<button class="submit-btn" id="resetBtn">RESET SYSTEM</button>
 
-<div class="keypad" id="keypad">
-<button class="key">1</button><button class="key">2</button><button class="key">3</button>
-<button class="key">4</button><button class="key">5</button><button class="key">6</button>
-<button class="key">7</button><button class="key">8</button><button class="key">9</button>
-<button class="key wide" data-action="clear">CLR</button>
-<button class="key">0</button>
+<!-- Birds -->
+<div class="bird" style="top:10%; animation-duration:8s;">🐦</div>
+<div class="bird reverse" style="top:20%; animation-duration:10s;">🕊️</div>
+<div class="bird" style="top:70%; animation-duration:12s;">🐦</div>
+<div class="bird reverse" style="top:50%; animation-duration:9s;">🕊️</div>
+
+<div class="container" id="game">
+  <h1>TROLL GUESS 😈</h1>
+
+  <div class="display" id="display">ENTER NUMBER</div>
+
+  <button class="btn" onclick="checkGuess()">TRY YOUR LUCK</button>
+  <button class="btn" onclick="resetGame()">RAGE QUIT 😂</button>
+
+  <div class="message" id="message"></div>
+
+  <div class="keypad">
+    <div class="key" onclick="addDigit('1')">1</div>
+    <div class="key" onclick="addDigit('2')">2</div>
+    <div class="key" onclick="addDigit('3')">3</div>
+    <div class="key" onclick="addDigit('4')">4</div>
+    <div class="key" onclick="addDigit('5')">5</div>
+    <div class="key" onclick="addDigit('6')">6</div>
+    <div class="key" onclick="addDigit('7')">7</div>
+    <div class="key" onclick="addDigit('8')">8</div>
+    <div class="key" onclick="addDigit('9')">9</div>
+    <div class="key" onclick="clearInput()">CLR</div>
+    <div class="key" onclick="addDigit('0')">0</div>
+  </div>
 </div>
 
-<div class="chance-boxes" id="boxes">
-<div class="box active"></div><div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <h2 id="popupText"></h2><br>
+    <button class="btn" onclick="closePopup()">OK 😭</button>
+  </div>
 </div>
-
-<div class="message" id="message"></div>
-<button id="restartBtn" class="play-again-btn" style="display:none">RESTART MISSION</button>
-</div>
-
-<div class="modal" id="modal"><div class="modal-content"><h2>ACCESS RESULT</h2><p id="rankText"></p><button class="close-btn" id="closeModal">CLOSE</button></div></div>
 
 <script>
-const input = document.getElementById('guessInput');
-const message = document.getElementById('message');
-const restartBtn = document.getElementById('restartBtn');
-const keypad = document.getElementById('keypad');
-const boxes = Array.from(document.querySelectorAll('.box'));
-const modal = document.getElementById('modal');
-const rankText = document.getElementById('rankText');
+let number=Math.floor(Math.random()*99)+1;
+let input="";
+let chances=7;
+let attempts=0;
 
-let guessNumber = rand();
-let chances = 7, idx = 0, gameOver = false;
+const trollLow=[
+"Bro… even birds guess better 💀",
+"Too low… like your confidence 😂",
+"Are you even trying?"
+];
 
-function rand(){ return Math.floor(Math.random()*99)+1 }
+const trollHigh=[
+"Too high genius 🤡",
+"Trying to reach Mars? 🚀",
+"Calm down bro"
+];
 
-keypad.addEventListener('click', e=>{
-  if(gameOver) return;
-  const t = e.target;
-  if(!t.classList.contains('key')) return;
-  if(t.dataset.action==='clear'){ input.value=''; return; }
-  if(input.value.length<2) input.value += t.textContent;
-});
+const fakeHints=[
+"You’re close… or am I lying 😏",
+"That felt right… but nope 😂",
+"Almost… just kidding 🤡"
+];
 
-document.getElementById('submitBtn').onclick = checkGuess;
-document.getElementById('resetBtn').onclick = restartGame;
-restartBtn.onclick = restartGame;
-document.getElementById('closeModal').onclick = ()=> modal.classList.remove('show');
+function updateDisplay(){
+  document.getElementById("display").innerText=input||"ENTER NUMBER";
+}
 
-function setActive(){ boxes.forEach(b=>b.classList.remove('active')); if(idx<boxes.length) boxes[idx].classList.add('active'); }
+function addDigit(d){
+  if(input.length<2){
+    input+=d;
+    updateDisplay();
+  }
+}
 
-function mark(type){ const b = boxes[idx]; b.classList.add(type); b.textContent = type==='wrong'?'✖':'✔'; idx++; setActive(); }
-
-function disableKeypad(){ keypad.style.pointerEvents='none'; keypad.style.opacity='.4'; }
-
-function showRank(attempts){
-  let msg = attempts===1 ? "⚡ FLASH ACCESS" : attempts<=3 ? "🧠 HIGH INTEL" : attempts<=5 ? "🐢 SLOW RESPONSE" : "💀 SYSTEM FAILURE";
-  rankText.textContent = `${msg} (${attempts} attempts)`;
-  modal.classList.add('show');
+function clearInput(){
+  input="";
+  updateDisplay();
 }
 
 function checkGuess(){
-  if(gameOver) return;
-  const n = Number(input.value);
-  if(!n || n<1 || n>99){ message.textContent='INVALID INPUT'; message.className='message error'; return; }
+  let msg=document.getElementById("message");
+  let game=document.getElementById("game");
+
+  let n=parseInt(input);
+
+  if(!n||n<1||n>99){
+    msg.innerText="Enter valid number bro 🤦";
+    return;
+  }
+
   chances--;
-  if(n===guessNumber){
-    mark('correct');
-    message.textContent='ACCESS GRANTED'; message.className='message success';
-    gameOver=true; restartBtn.style.display='block'; disableKeypad(); showRank(idx);
+  attempts++;
+
+  if(n===number){
+    showPopup(winMessage());
+    return;
+  }
+
+  game.classList.add("shake");
+  setTimeout(()=>game.classList.remove("shake"),300);
+
+  if(Math.random()<0.3){
+    msg.innerText=fakeHints[Math.floor(Math.random()*fakeHints.length)];
   }else{
-    mark('wrong');
-    if(n<guessNumber){
-  message.textContent='[ SYSTEM ] >> VALUE TOO LOW... INCREASE INPUT';
-}else{
-  message.textContent='[ SYSTEM ] >> VALUE TOO HIGH... DECREASE INPUT';
-}
-    message.className='message error hint';
+    msg.innerText=n<number
+      ? trollLow[Math.floor(Math.random()*trollLow.length)]
+      : trollHigh[Math.floor(Math.random()*trollHigh.length)];
   }
-  if(chances===0 && n!==guessNumber){
-    message.textContent=`ACCESS DENIED (${guessNumber})`;
-    gameOver=true; restartBtn.style.display='block'; disableKeypad();
+
+  if(chances===0){
+    showPopup("Game Over 🤡 Number was "+number);
   }
-  input.value='';
+
+  input="";
+  updateDisplay();
 }
 
-function restartGame(){
-  guessNumber = rand(); chances=7; idx=0; gameOver=false;
-  boxes.forEach((b,i)=>{ b.className='box'; b.textContent=''; if(i===0) b.classList.add('active'); });
-  message.textContent=''; restartBtn.style.display='none'; input.value='';
-  keypad.style.pointerEvents='auto'; keypad.style.opacity='1'; modal.classList.remove('show');
+function winMessage(){
+  if(attempts===1) return "Okay relax Einstein ⚡";
+  if(attempts<=3) return "Lucky or smart? 🤔";
+  if(attempts<=5) return "Finally… took forever 🚶";
+  return "Barely survived 💀";
 }
+
+function showPopup(text){
+  document.getElementById("popupText").innerText=text;
+  document.getElementById("popup").style.display="flex";
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display="none";
+  resetGame();
+}
+
+function resetGame(){
+  number=Math.floor(Math.random()*99)+1;
+  input="";
+  chances=7;
+  attempts=0;
+  document.getElementById("message").innerText="";
+  updateDisplay();
+}
+
+updateDisplay();
 </script>
+
 </body>
 </html>
