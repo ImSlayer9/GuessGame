@@ -6,122 +6,87 @@
 <title>Troll Guess 😈</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
-
 body{
-  height:100vh;
-  background:radial-gradient(circle at top,#1a1a1a,#000);
-  color:white;
+  margin:0;
   overflow:hidden;
+  background:#000;
+  color:#fff;
+  font-family:sans-serif;
   display:flex;
   justify-content:center;
   align-items:center;
+  height:100vh;
 }
 
-/* ===== Floating Birds ===== */
+/* Birds */
 .bird{
   position:absolute;
   font-size:24px;
-  opacity:0.7;
-  animation:flyRight linear infinite;
+  animation:fly linear infinite;
 }
-
-.bird.reverse{
-  animation:flyLeft linear infinite;
-}
-
-@keyframes flyRight{
+@keyframes fly{
   from{transform:translateX(-10vw)}
   to{transform:translateX(110vw)}
 }
 
-@keyframes flyLeft{
-  from{transform:translateX(110vw)}
-  to{transform:translateX(-10vw)}
+/* Dropping emoji */
+.drop{
+  position:absolute;
+  font-size:20px;
+  animation:fall 2s linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(100vh); opacity:0;}
 }
 
-/* ===== Main Card ===== */
+/* Card */
 .container{
-  width:380px;
-  padding:25px;
-  border-radius:20px;
-  backdrop-filter:blur(20px);
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.1);
-  box-shadow:0 0 40px rgba(255,0,80,0.2);
+  width:360px;
+  padding:20px;
+  border-radius:15px;
+  background:#111;
   text-align:center;
   z-index:2;
 }
 
-/* Title */
-h1{
-  font-size:26px;
-  color:#ff4d6d;
-  margin-bottom:15px;
-  letter-spacing:1px;
-}
-
 /* Display */
 .display{
-  padding:18px;
-  border-radius:12px;
-  font-size:28px;
-  margin-bottom:12px;
-  background:rgba(0,0,0,0.6);
-  border:1px solid rgba(255,77,109,0.5);
+  padding:15px;
+  border:1px solid #fff;
+  margin-bottom:10px;
+  font-size:24px;
 }
 
 /* Buttons */
-.btn{
+button{
   width:100%;
-  padding:12px;
-  margin:6px 0;
-  border-radius:12px;
-  border:none;
-  background:linear-gradient(45deg,#ff4d6d,#ff1e4d);
+  padding:10px;
+  margin:5px 0;
+  background:#ff004c;
   color:white;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-.btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 0 15px #ff4d6d;
+  border:none;
 }
 
 /* Keypad */
 .keypad{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:15px;
+  gap:5px;
 }
 
 .key{
   padding:15px;
-  border-radius:12px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.1);
-  cursor:pointer;
-  transition:0.2s;
+  background:#222;
 }
 
-.key:hover{
-  background:#ff4d6d;
+/* Shake */
+.shake{
+  animation:shake 0.3s;
 }
-
-/* Message */
-.message{
-  margin-top:12px;
-  min-height:40px;
-  font-size:14px;
-  color:#ffb3c1;
+@keyframes shake{
+  25%{transform:translateX(-5px)}
+  50%{transform:translateX(5px)}
+  75%{transform:translateX(-5px)}
 }
 
 /* Popup */
@@ -135,33 +100,10 @@ h1{
   justify-content:center;
   align-items:center;
   background:rgba(0,0,0,0.8);
-  z-index:5;
 }
-
 .popup-box{
   background:#111;
-  padding:30px;
-  border-radius:15px;
-  text-align:center;
-  animation:pop 0.3s ease;
-}
-
-@keyframes pop{
-  from{transform:scale(0.7);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-
-/* Shake */
-.shake{
-  animation:shake 0.3s;
-}
-
-@keyframes shake{
-  0%{transform:translateX(0)}
-  25%{transform:translateX(-6px)}
-  50%{transform:translateX(6px)}
-  75%{transform:translateX(-6px)}
-  100%{transform:translateX(0)}
+  padding:20px;
 }
 </style>
 </head>
@@ -169,42 +111,43 @@ h1{
 <body>
 
 <!-- Birds -->
-<div class="bird" style="top:10%; animation-duration:8s;">🐦</div>
-<div class="bird reverse" style="top:20%; animation-duration:10s;">🕊️</div>
-<div class="bird" style="top:70%; animation-duration:12s;">🐦</div>
-<div class="bird reverse" style="top:50%; animation-duration:9s;">🕊️</div>
+<div class="bird" style="top:10%;animation-duration:8s;">🐦</div>
+<div class="bird" style="top:50%;animation-duration:12s;">🕊️</div>
 
 <div class="container" id="game">
-  <h1>TROLL GUESS 😈</h1>
+  <h2>TROLL GUESS 😈</h2>
 
-  <div class="display" id="display">ENTER NUMBER</div>
+  <div class="display" id="display">ENTER</div>
 
-  <button class="btn" onclick="checkGuess()">TRY YOUR LUCK</button>
-  <button class="btn" onclick="resetGame()">RAGE QUIT 😂</button>
+  <button onclick="checkGuess()">GUESS</button>
+  <button onclick="resetGame()">RESET 😂</button>
 
-  <div class="message" id="message"></div>
+  <div id="message"></div>
 
   <div class="keypad">
-    <div class="key" onclick="addDigit('1')">1</div>
-    <div class="key" onclick="addDigit('2')">2</div>
-    <div class="key" onclick="addDigit('3')">3</div>
-    <div class="key" onclick="addDigit('4')">4</div>
-    <div class="key" onclick="addDigit('5')">5</div>
-    <div class="key" onclick="addDigit('6')">6</div>
-    <div class="key" onclick="addDigit('7')">7</div>
-    <div class="key" onclick="addDigit('8')">8</div>
-    <div class="key" onclick="addDigit('9')">9</div>
+    <div class="key" onclick="add('1')">1</div>
+    <div class="key" onclick="add('2')">2</div>
+    <div class="key" onclick="add('3')">3</div>
+    <div class="key" onclick="add('4')">4</div>
+    <div class="key" onclick="add('5')">5</div>
+    <div class="key" onclick="add('6')">6</div>
+    <div class="key" onclick="add('7')">7</div>
+    <div class="key" onclick="add('8')">8</div>
+    <div class="key" onclick="add('9')">9</div>
     <div class="key" onclick="clearInput()">CLR</div>
-    <div class="key" onclick="addDigit('0')">0</div>
+    <div class="key" onclick="add('0')">0</div>
   </div>
 </div>
 
 <div class="popup" id="popup">
   <div class="popup-box">
-    <h2 id="popupText"></h2><br>
-    <button class="btn" onclick="closePopup()">OK 😭</button>
+    <h2 id="popupText"></h2>
+    <button onclick="closePopup()">OK</button>
   </div>
 </div>
+
+<!-- Sound -->
+<audio id="laugh" src="https://www.soundjay.com/human/laugh-01.mp3"></audio>
 
 <script>
 let number=Math.floor(Math.random()*99)+1;
@@ -212,48 +155,38 @@ let input="";
 let chances=7;
 let attempts=0;
 
-const trollLow=[
-"Bro… even birds guess better 💀",
-"Too low… like your confidence 😂",
-"Are you even trying?"
-];
-
-const trollHigh=[
-"Too high genius 🤡",
-"Trying to reach Mars? 🚀",
-"Calm down bro"
-];
-
-const fakeHints=[
-"You’re close… or am I lying 😏",
-"That felt right… but nope 😂",
-"Almost… just kidding 🤡"
-];
-
-function updateDisplay(){
-  document.getElementById("display").innerText=input||"ENTER NUMBER";
-}
-
-function addDigit(d){
+function add(d){
   if(input.length<2){
     input+=d;
-    updateDisplay();
+    update();
   }
 }
 
 function clearInput(){
   input="";
-  updateDisplay();
+  update();
+}
+
+function update(){
+  document.getElementById("display").innerText=input||"ENTER";
+}
+
+function dropEmoji(){
+  let e=document.createElement("div");
+  e.className="drop";
+  e.style.left=Math.random()*100+"vw";
+  e.innerText=Math.random()>0.5?"😂":"💩";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),2000);
 }
 
 function checkGuess(){
+  let n=parseInt(input);
   let msg=document.getElementById("message");
   let game=document.getElementById("game");
 
-  let n=parseInt(input);
-
   if(!n||n<1||n>99){
-    msg.innerText="Enter valid number bro 🤦";
+    msg.innerText="Enter valid number 🤦";
     return;
   }
 
@@ -261,19 +194,27 @@ function checkGuess(){
   attempts++;
 
   if(n===number){
-    showPopup(winMessage());
+    showPopup("You won... somehow 😒");
     return;
   }
 
+  // correct hint + troll
+  if(n<number){
+    msg.innerText="Too LOW 😂 try higher bro";
+  }else{
+    msg.innerText="Too HIGH 🤡 come down";
+  }
+
+  // laugh sound
+  document.getElementById("laugh").play();
+
+  // shake
   game.classList.add("shake");
   setTimeout(()=>game.classList.remove("shake"),300);
 
-  if(Math.random()<0.3){
-    msg.innerText=fakeHints[Math.floor(Math.random()*fakeHints.length)];
-  }else{
-    msg.innerText=n<number
-      ? trollLow[Math.floor(Math.random()*trollLow.length)]
-      : trollHigh[Math.floor(Math.random()*trollHigh.length)];
+  // emoji rain
+  for(let i=0;i<3;i++){
+    setTimeout(dropEmoji, i*200);
   }
 
   if(chances===0){
@@ -281,14 +222,7 @@ function checkGuess(){
   }
 
   input="";
-  updateDisplay();
-}
-
-function winMessage(){
-  if(attempts===1) return "Okay relax Einstein ⚡";
-  if(attempts<=3) return "Lucky or smart? 🤔";
-  if(attempts<=5) return "Finally… took forever 🚶";
-  return "Barely survived 💀";
+  update();
 }
 
 function showPopup(text){
@@ -307,10 +241,10 @@ function resetGame(){
   chances=7;
   attempts=0;
   document.getElementById("message").innerText="";
-  updateDisplay();
+  update();
 }
 
-updateDisplay();
+update();
 </script>
 
 </body>
