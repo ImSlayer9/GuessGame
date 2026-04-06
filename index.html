@@ -17,7 +17,7 @@ body{
   align-items:center;
 }
 
-/* Canvas trail */
+/* Canvas */
 canvas{
   position:fixed;
   top:0;
@@ -62,13 +62,14 @@ h1{
   margin:6px 0;
   border:none;
   border-radius:12px;
-  background:#222;
+  background:#1f1f1f;
   color:#fff;
   cursor:pointer;
   transition:0.3s;
 }
 .btn:hover{
-  background:#444;
+  background:#fff;
+  color:#000;
 }
 
 /* Keypad */
@@ -83,7 +84,7 @@ h1{
   padding:18px;
   border-radius:15px;
   font-size:18px;
-  background:#1a1a1a;
+  background:#111;
   border:1px solid #333;
   cursor:pointer;
   transition:0.25s;
@@ -171,7 +172,7 @@ h1{
 <audio id="laugh" src="https://www.soundjay.com/human/laugh-01.mp3"></audio>
 
 <script>
-/* ===== Canvas Trail ===== */
+/* ===== PREMIUM SMOOTH GLOW TRAIL ===== */
 const canvas = document.getElementById("trailCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -181,32 +182,56 @@ canvas.height = window.innerHeight;
 let points = [];
 
 document.addEventListener("mousemove", (e) => {
-  points.push({x: e.clientX, y: e.clientY});
-  if(points.length > 20) points.shift();
+  points.push({
+    x: e.clientX,
+    y: e.clientY,
+    life: 1
+  });
+
+  if (points.length > 60) points.shift();
 });
 
-function drawTrail(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+function drawTrail() {
+  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.beginPath();
-  ctx.strokeStyle = "white";
-  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
 
-  for(let i=0;i<points.length;i++){
-    let p = points[i];
-    if(i===0){
-      ctx.moveTo(p.x,p.y);
-    }else{
-      ctx.lineTo(p.x,p.y);
-    }
+  for (let i = 0; i < points.length - 1; i++) {
+    let p1 = points[i];
+    let p2 = points[i + 1];
+
+    p1.life *= 0.96;
+
+    let alpha = p1.life;
+    let width = 6 * alpha;
+
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+    ctx.lineWidth = width;
+
+    let midX = (p1.x + p2.x) / 2;
+    let midY = (p1.y + p2.y) / 2;
+
+    ctx.moveTo(p1.x, p1.y);
+    ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+    ctx.stroke();
   }
 
-  ctx.stroke();
+  points = points.filter(p => p.life > 0.05);
+
   requestAnimationFrame(drawTrail);
 }
+
 drawTrail();
 
-/* ===== Game Logic ===== */
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+/* ===== GAME LOGIC ===== */
 let number=Math.floor(Math.random()*99)+1;
 let input="";
 let chances=7;
