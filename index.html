@@ -6,77 +6,122 @@
 <title>Troll Guess 😈</title>
 
 <style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
+
 body{
-  margin:0;
+  height:100vh;
+  background:linear-gradient(135deg,#1a1a1a,#000);
   overflow:hidden;
-  background:#000;
-  color:#fff;
-  font-family:sans-serif;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
 }
 
-/* Birds */
-.bird{
-  position:absolute;
-  font-size:24px;
-  animation:fly linear infinite;
-}
-@keyframes fly{
-  from{transform:translateX(-10vw)}
-  to{transform:translateX(110vw)}
-}
-
-/* Dropping emoji */
-.drop{
-  position:absolute;
-  font-size:20px;
-  animation:fall 2s linear forwards;
-}
-@keyframes fall{
-  to{transform:translateY(100vh); opacity:0;}
-}
-
-/* Card */
+/* Glass Card */
 .container{
-  width:360px;
-  padding:20px;
-  border-radius:15px;
-  background:#111;
+  width:380px;
+  padding:25px;
+  border-radius:20px;
+  backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 0 40px rgba(255,0,80,0.2);
   text-align:center;
   z-index:2;
 }
 
+/* Title */
+h1{
+  color:#ff4d6d;
+  margin-bottom:15px;
+}
+
 /* Display */
 .display{
-  padding:15px;
-  border:1px solid #fff;
-  margin-bottom:10px;
-  font-size:24px;
+  padding:18px;
+  border-radius:12px;
+  font-size:28px;
+  background:rgba(0,0,0,0.6);
+  margin-bottom:12px;
 }
 
 /* Buttons */
-button{
+.btn{
   width:100%;
-  padding:10px;
-  margin:5px 0;
-  background:#ff004c;
-  color:white;
+  padding:12px;
+  margin:6px 0;
   border:none;
+  border-radius:12px;
+  background:linear-gradient(45deg,#ff4d6d,#ff1e4d);
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+}
+.btn:hover{
+  transform:scale(1.05);
 }
 
 /* Keypad */
 .keypad{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:5px;
+  gap:10px;
+  margin-top:15px;
 }
 
 .key{
-  padding:15px;
-  background:#222;
+  padding:18px;
+  border-radius:15px;
+  font-size:18px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.2);
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.key:hover{
+  background:#ff4d6d;
+  transform:scale(1.1);
+  box-shadow:0 0 10px #ff4d6d;
+}
+
+/* Message */
+.message{
+  margin-top:10px;
+  min-height:40px;
+  color:#ffb3c1;
+}
+
+/* Popup */
+.popup{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.8);
+}
+
+.popup-box{
+  background:#111;
+  padding:25px;
+  border-radius:15px;
+}
+
+/* Mouse Trail */
+.trail{
+  position:absolute;
+  width:10px;
+  height:10px;
+  background:#ff4d6d;
+  border-radius:50%;
+  pointer-events:none;
+  animation:fade 0.6s linear forwards;
+}
+
+@keyframes fade{
+  to{opacity:0; transform:scale(2);}
 }
 
 /* Shake */
@@ -88,41 +133,20 @@ button{
   50%{transform:translateX(5px)}
   75%{transform:translateX(-5px)}
 }
-
-/* Popup */
-.popup{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.8);
-}
-.popup-box{
-  background:#111;
-  padding:20px;
-}
 </style>
 </head>
 
 <body>
 
-<!-- Birds -->
-<div class="bird" style="top:10%;animation-duration:8s;">🐦</div>
-<div class="bird" style="top:50%;animation-duration:12s;">🕊️</div>
-
 <div class="container" id="game">
-  <h2>TROLL GUESS 😈</h2>
+  <h1>TROLL GUESS 😈</h1>
 
-  <div class="display" id="display">ENTER</div>
+  <div class="display" id="display">ENTER NUMBER</div>
 
-  <button onclick="checkGuess()">GUESS</button>
-  <button onclick="resetGame()">RESET 😂</button>
+  <button class="btn" onclick="checkGuess()">TRY YOUR LUCK</button>
+  <button class="btn" onclick="resetGame()">RAGE QUIT 😂</button>
 
-  <div id="message"></div>
+  <div class="message" id="message"></div>
 
   <div class="keypad">
     <div class="key" onclick="add('1')">1</div>
@@ -142,11 +166,10 @@ button{
 <div class="popup" id="popup">
   <div class="popup-box">
     <h2 id="popupText"></h2>
-    <button onclick="closePopup()">OK</button>
+    <button class="btn" onclick="closePopup()">OK</button>
   </div>
 </div>
 
-<!-- Sound -->
 <audio id="laugh" src="https://www.soundjay.com/human/laugh-01.mp3"></audio>
 
 <script>
@@ -154,6 +177,16 @@ let number=Math.floor(Math.random()*99)+1;
 let input="";
 let chances=7;
 let attempts=0;
+
+/* Mouse Trail Effect */
+document.addEventListener("mousemove",e=>{
+  let t=document.createElement("div");
+  t.className="trail";
+  t.style.left=e.pageX+"px";
+  t.style.top=e.pageY+"px";
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),600);
+});
 
 function add(d){
   if(input.length<2){
@@ -168,16 +201,7 @@ function clearInput(){
 }
 
 function update(){
-  document.getElementById("display").innerText=input||"ENTER";
-}
-
-function dropEmoji(){
-  let e=document.createElement("div");
-  e.className="drop";
-  e.style.left=Math.random()*100+"vw";
-  e.innerText=Math.random()>0.5?"😂":"💩";
-  document.body.appendChild(e);
-  setTimeout(()=>e.remove(),2000);
+  document.getElementById("display").innerText=input||"ENTER NUMBER";
 }
 
 function checkGuess(){
@@ -198,24 +222,16 @@ function checkGuess(){
     return;
   }
 
-  // correct hint + troll
   if(n<number){
     msg.innerText="Too LOW 😂 try higher bro";
   }else{
     msg.innerText="Too HIGH 🤡 come down";
   }
 
-  // laugh sound
   document.getElementById("laugh").play();
 
-  // shake
   game.classList.add("shake");
   setTimeout(()=>game.classList.remove("shake"),300);
-
-  // emoji rain
-  for(let i=0;i<3;i++){
-    setTimeout(dropEmoji, i*200);
-  }
 
   if(chances===0){
     showPopup("Game Over 🤡 Number was "+number);
