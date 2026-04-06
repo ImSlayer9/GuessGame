@@ -9,12 +9,20 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
 
 body{
-  height:100vh;
-  background:linear-gradient(135deg,#1a1a1a,#000);
+  background:#000;
   overflow:hidden;
+  height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
+}
+
+/* Canvas trail */
+canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:0;
 }
 
 /* Glass Card */
@@ -22,17 +30,17 @@ body{
   width:380px;
   padding:25px;
   border-radius:20px;
-  backdrop-filter:blur(20px);
+  backdrop-filter:blur(15px);
   background:rgba(255,255,255,0.05);
   border:1px solid rgba(255,255,255,0.1);
-  box-shadow:0 0 40px rgba(255,0,80,0.2);
+  box-shadow:0 0 30px rgba(255,255,255,0.1);
   text-align:center;
   z-index:2;
 }
 
 /* Title */
 h1{
-  color:#ff4d6d;
+  color:#fff;
   margin-bottom:15px;
 }
 
@@ -41,8 +49,10 @@ h1{
   padding:18px;
   border-radius:12px;
   font-size:28px;
-  background:rgba(0,0,0,0.6);
+  background:#111;
   margin-bottom:12px;
+  border:1px solid #333;
+  color:#fff;
 }
 
 /* Buttons */
@@ -52,13 +62,13 @@ h1{
   margin:6px 0;
   border:none;
   border-radius:12px;
-  background:linear-gradient(45deg,#ff4d6d,#ff1e4d);
+  background:#222;
   color:#fff;
   cursor:pointer;
   transition:0.3s;
 }
 .btn:hover{
-  transform:scale(1.05);
+  background:#444;
 }
 
 /* Keypad */
@@ -73,23 +83,23 @@ h1{
   padding:18px;
   border-radius:15px;
   font-size:18px;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.2);
+  background:#1a1a1a;
+  border:1px solid #333;
   cursor:pointer;
-  transition:0.3s;
+  transition:0.25s;
 }
 
 .key:hover{
-  background:#ff4d6d;
+  background:#fff;
+  color:#000;
   transform:scale(1.1);
-  box-shadow:0 0 10px #ff4d6d;
 }
 
 /* Message */
 .message{
   margin-top:10px;
   min-height:40px;
-  color:#ffb3c1;
+  color:#ccc;
 }
 
 /* Popup */
@@ -101,27 +111,13 @@ h1{
   justify-content:center;
   align-items:center;
   background:rgba(0,0,0,0.8);
+  z-index:5;
 }
 
 .popup-box{
   background:#111;
   padding:25px;
   border-radius:15px;
-}
-
-/* Mouse Trail */
-.trail{
-  position:absolute;
-  width:10px;
-  height:10px;
-  background:#ff4d6d;
-  border-radius:50%;
-  pointer-events:none;
-  animation:fade 0.6s linear forwards;
-}
-
-@keyframes fade{
-  to{opacity:0; transform:scale(2);}
 }
 
 /* Shake */
@@ -137,6 +133,8 @@ h1{
 </head>
 
 <body>
+
+<canvas id="trailCanvas"></canvas>
 
 <div class="container" id="game">
   <h1>TROLL GUESS 😈</h1>
@@ -173,20 +171,45 @@ h1{
 <audio id="laugh" src="https://www.soundjay.com/human/laugh-01.mp3"></audio>
 
 <script>
+/* ===== Canvas Trail ===== */
+const canvas = document.getElementById("trailCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let points = [];
+
+document.addEventListener("mousemove", (e) => {
+  points.push({x: e.clientX, y: e.clientY});
+  if(points.length > 20) points.shift();
+});
+
+function drawTrail(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.beginPath();
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+
+  for(let i=0;i<points.length;i++){
+    let p = points[i];
+    if(i===0){
+      ctx.moveTo(p.x,p.y);
+    }else{
+      ctx.lineTo(p.x,p.y);
+    }
+  }
+
+  ctx.stroke();
+  requestAnimationFrame(drawTrail);
+}
+drawTrail();
+
+/* ===== Game Logic ===== */
 let number=Math.floor(Math.random()*99)+1;
 let input="";
 let chances=7;
-let attempts=0;
-
-/* Mouse Trail Effect */
-document.addEventListener("mousemove",e=>{
-  let t=document.createElement("div");
-  t.className="trail";
-  t.style.left=e.pageX+"px";
-  t.style.top=e.pageY+"px";
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),600);
-});
 
 function add(d){
   if(input.length<2){
@@ -201,7 +224,7 @@ function clearInput(){
 }
 
 function update(){
-  document.getElementById("display").innerText=input||"TRY ME";
+  document.getElementById("display").innerText=input||"ENTER NUMBER";
 }
 
 function checkGuess(){
@@ -215,18 +238,15 @@ function checkGuess(){
   }
 
   chances--;
-  attempts++;
 
   if(n===number){
     showPopup("You won... somehow 😒");
     return;
   }
 
-  if(n<number){
-    msg.innerText="Too LOW 😂 try higher bro";
-  }else{
-    msg.innerText="Too HIGH 🤡 come down";
-  }
+  msg.innerText = n<number
+    ? "Too LOW 😂 go higher"
+    : "Too HIGH 🤡 come down";
 
   document.getElementById("laugh").play();
 
@@ -255,7 +275,6 @@ function resetGame(){
   number=Math.floor(Math.random()*99)+1;
   input="";
   chances=7;
-  attempts=0;
   document.getElementById("message").innerText="";
   update();
 }
