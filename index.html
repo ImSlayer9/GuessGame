@@ -3,120 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Troll Guess 😈</title>
+<title>Guess the Number</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
 
 body{
   background:#000;
-  overflow:hidden;
+  color:#fff;
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* CLOCK */
-.clock{
-  position:fixed;
-  top:15px;
-  left:20px;
-  color:#fff;
-  font-size:18px;
-  font-weight:bold;
-  z-index:3;
-  letter-spacing:1px;
-}
-
-/* Canvas */
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:0;
-}
-
-/* Glass Card */
 .container{
-  width:380px;
+  width:360px;
   padding:25px;
-  border-radius:20px;
-  background: rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px);
-  text-align:center;
-  z-index:2;
-}
-
-h1{color:#fff;margin-bottom:10px;}
-
-.display{
-  padding:18px;
   border-radius:12px;
-  font-size:28px;
   background:#111;
   border:1px solid #333;
-  color:#aaa;
-  margin-bottom:10px;
+  text-align:center;
 }
 
-.chances{
+h1{margin-bottom:10px;}
+
+.display{
+  padding:15px;
+  border-radius:8px;
+  background:#000;
+  border:1px solid #333;
+  margin-bottom:10px;
+  font-size:22px;
+}
+
+/* Boxes */
+.guesses, .chances{
   display:flex;
   justify-content:space-between;
-  margin-bottom:10px;
+  margin-bottom:6px;
 }
 
-.box{
-  width:30px;height:30px;border-radius:8px;
-  background:#111;border:1px solid #333;
+.guess-box, .box{
+  width:32px;height:32px;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  border:1px solid #333;
 }
 
-.box.wrong{background:#ff0033;}
-.box.correct{background:#00ff99;}
-
-/* STRICT WHITE BUTTONS */
-.btn, .key{
-  background:#ffffff !important;
-  color:#000000 !important;
-  border:none;
-  box-shadow:none;
-  font-weight:bold;
-  cursor:pointer;
+.guess-box.low{
+  background:#001f3f;
+  color:#00aaff;
 }
 
-.btn{
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  border-radius:12px;
+.guess-box.high{
+  background:#3f0000;
+  color:#ff4d4d;
 }
 
+/* Keypad */
 .keypad{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
-  margin-top:15px;
+  margin-top:10px;
 }
 
 .key{
-  padding:18px;
-  border-radius:12px;
+  padding:15px;
+  border-radius:8px;
+  background:#fff;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
 }
 
+/* Bottom buttons FIXED */
+.bottom-buttons{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.bottom-buttons button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#fff;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* Message */
 .message{
   margin-top:10px;
-  min-height:40px;
-  color:#ccc;
-}
-
-.leaderboard{
-  margin-top:10px;
-  text-align:left;
-  color:#fff;
+  min-height:30px;
   font-size:14px;
 }
 
+/* Popup */
 .popup{
   position:fixed;
   top:0;left:0;
@@ -124,38 +114,50 @@ h1{color:#fff;margin-bottom:10px;}
   display:none;
   justify-content:center;
   align-items:center;
-  background:#000;
+  background:rgba(0,0,0,0.9);
 }
 
 .popup-box{
   background:#111;
   padding:25px;
-  border-radius:15px;
+  border-radius:14px;
+  width:280px;
+  text-align:center;
+  border:1px solid #444;
+}
+
+.popup-box h2{
+  margin-bottom:15px;
+  line-height:1.4;
+}
+
+.popup-buttons{
+  display:flex;
+  gap:10px;
+}
+
+.popup-buttons button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#fff;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- CLOCK -->
-<div class="clock" id="clock"></div>
-
-<canvas id="trailCanvas"></canvas>
-
 <div class="container">
-  <h1>TROLL GUESS 😈</h1>
+  <h1>Guess the Number</h1>
 
-  <div class="display" id="display">TRY ME</div>
+  <div class="display" id="display">Enter (1-99)</div>
 
-  <div class="chances">
-    <div class="box"></div><div class="box"></div><div class="box"></div>
-    <div class="box"></div><div class="box"></div><div class="box"></div>
-    <div class="box"></div>
-  </div>
-
-  <button class="btn" onclick="checkGuess()">TRY YOUR LUCK</button>
-  <button class="btn" onclick="resetGame()">RAGE QUIT 😂</button>
-  <button class="btn" onclick="toggleSound()">🔊 Toggle Sound</button>
+  <div class="guesses" id="guesses"></div>
+  <div class="chances" id="chances"></div>
 
   <div class="message" id="message"></div>
 
@@ -169,169 +171,142 @@ h1{color:#fff;margin-bottom:10px;}
     <div class="key" onclick="add('7')">7</div>
     <div class="key" onclick="add('8')">8</div>
     <div class="key" onclick="add('9')">9</div>
-    <div class="key" onclick="clearInput()">CLR</div>
+    <div class="key" onclick="showResult()">RESULT</div>
     <div class="key" onclick="add('0')">0</div>
+    <div class="key" onclick="checkGuess()">✔</div>
   </div>
 
-  <div class="leaderboard" id="leaderboard"></div>
+  <div class="bottom-buttons">
+    <button onclick="clearInput()">Clear</button>
+    <button onclick="resetGame()">Reset</button>
+  </div>
 </div>
 
+<!-- Popup -->
 <div class="popup" id="popup">
   <div class="popup-box">
     <h2 id="popupText"></h2>
-    <button class="btn" onclick="closePopup()">OK</button>
+    <div class="popup-buttons">
+      <button onclick="closePopup()">OK</button>
+      <button onclick="playAgain()">Play Again</button>
+    </div>
   </div>
 </div>
 
-<audio id="laugh" src="https://www.soundjay.com/human/laugh-01.mp3"></audio>
-
 <script>
-/* ===== CLOCK ===== */
-function updateClock(){
-  let now = new Date();
-  let h = String(now.getHours()).padStart(2,'0');
-  let m = String(now.getMinutes()).padStart(2,'0');
-  let s = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById("clock").innerText = `${h}:${m}:${s}`;
-}
-setInterval(updateClock,1000);
-updateClock();
-
-/* ===== TRAIL ===== */
-const canvas=document.getElementById("trailCanvas");
-const ctx=canvas.getContext("2d");
-
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-
-let points=[],particles=[];
-
-document.addEventListener("mousemove",e=>{
-  points.push({x:e.clientX,y:e.clientY});
-  if(points.length>50)points.shift();
-
-  for(let i=0;i<2;i++){
-    particles.push({
-      x:e.clientX,
-      y:e.clientY,
-      vx:(Math.random()-0.5)*3,
-      vy:(Math.random()-0.5)*3,
-      life:1
-    });
-  }
-});
-
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  if(points.length>1){
-    ctx.beginPath();
-    ctx.moveTo(points[0].x,points[0].y);
-
-    for(let i=1;i<points.length;i++){
-      ctx.lineTo(points[i].x,points[i].y);
-    }
-
-    ctx.strokeStyle="#ffffff";
-    ctx.lineWidth=2.5;
-    ctx.shadowBlur=10;
-    ctx.shadowColor="#ffffff";
-    ctx.stroke();
-  }
-
-  particles.forEach(p=>{
-    p.x+=p.vx;
-    p.y+=p.vy;
-    p.life-=0.05;
-
-    ctx.fillStyle=`rgba(255,255,255,${p.life})`;
-    ctx.fillRect(p.x,p.y,2,2);
-  });
-
-  particles=particles.filter(p=>p.life>0);
-
-  requestAnimationFrame(draw);
-}
-draw();
-
-/* ===== GAME ===== */
 let number=Math.floor(Math.random()*99)+1;
-let input="",chances=7,index=0,soundOn=true;
+let input="";
+let attempts=0;
+let max=7;
 
-const lowMsg=["Too LOW 😂 go higher","Still low 🤡","Up ↑"];
-const highMsg=["Too HIGH 🤡 come down","Lower 😂","Down ↓"];
+/* Create boxes */
+for(let i=0;i<max;i++){
+  chances.innerHTML+=`<div class="box"></div>`;
+  guesses.innerHTML+=`<div class="guess-box"></div>`;
+}
 
-function add(d){if(input.length<2){input+=d;update();}}
-function clearInput(){input="";update();}
-function update(){display.innerText=input||"TRY ME";}
+function add(d){
+  if(input.length<2){
+    input+=d;
+    updateDisplay();
+  }
+}
+
+function clearInput(){
+  input="";
+  updateDisplay();
+}
+
+function updateDisplay(){
+  display.innerText=input || "Enter (1-99)";
+}
 
 function checkGuess(){
-  let n=parseInt(input);
+  let val=parseInt(input);
   let boxes=document.querySelectorAll(".box");
+  let guessBoxes=document.querySelectorAll(".guess-box");
 
-  if(!n||n<1||n>99){
-    message.innerText="Enter valid 🤦";
+  if(!val || val<1 || val>99){
+    message.innerText="Enter valid number";
     return;
   }
 
-  chances--;
+  if(attempts>=max) return;
 
-  if(n===number){
-    boxes[index].classList.add("correct");
-    saveScore(7-chances);
-    showPopup("You won 😒");
+  guessBoxes[attempts].innerText=val;
+
+  if(val===number){
+    boxes[attempts].innerText="✅";
+    attempts++;
+    showWin();
     return;
+  }else{
+    boxes[attempts].innerText="❌";
+
+    if(val<number){
+      guessBoxes[attempts].classList.add("low");
+      message.innerText="Too low";
+    }else{
+      guessBoxes[attempts].classList.add("high");
+      message.innerText="Too high";
+    }
+
+    attempts++;
   }
 
-  boxes[index].classList.add("wrong");
-  index++;
-
-  message.innerText = n<number
-    ? lowMsg[Math.floor(Math.random()*lowMsg.length)]
-    : highMsg[Math.floor(Math.random()*highMsg.length)];
-
-  if(soundOn) laugh.play();
-
-  if(chances===0){
-    showPopup("Game Over 🤡 Number was "+number);
+  if(attempts===max){
+    showLose();
   }
 
-  input="";
-  update();
+  clearInput();
 }
 
-function toggleSound(){soundOn=!soundOn;}
+function showResult(){
+  popupText.innerHTML=`🤖 Answer is: <b>${number}</b>`;
+  popup.style.display="flex";
+}
+
+function getRank(a){
+  if(a===1) return "Psychic 🔮";
+  if(a===2) return "Mind Reader 🧠";
+  if(a===3) return "Sharp 🎯";
+  if(a===4) return "Good 👍";
+  if(a===5) return "Average 😐";
+  if(a===6) return "Lucky 😅";
+  return "Survivor 💀";
+}
+
+function showWin(){
+  popupText.innerHTML=`🎉 You Won!<br><br><b>${getRank(attempts)}</b><br>Attempts: ${attempts}`;
+  popup.style.display="flex";
+}
+
+function showLose(){
+  popupText.innerHTML=`💀 Game Over<br><br>Number was: <b>${number}</b>`;
+  popup.style.display="flex";
+}
+
+function closePopup(){
+  popup.style.display="none";
+}
+
+function playAgain(){
+  popup.style.display="none";
+  resetGame();
+}
 
 function resetGame(){
   number=Math.floor(Math.random()*99)+1;
-  input="";chances=7;index=0;
+  input="";
+  attempts=0;
   message.innerText="";
-  document.querySelectorAll(".box").forEach(b=>{
-    b.classList.remove("wrong","correct");
+  document.querySelectorAll(".box").forEach(b=>b.innerText="");
+  document.querySelectorAll(".guess-box").forEach(b=>{
+    b.innerText="";
+    b.classList.remove("low","high");
   });
-  update();
+  updateDisplay();
 }
-
-/* ===== LEADERBOARD ===== */
-function saveScore(score){
-  let scores=JSON.parse(localStorage.getItem("scores")||"[]");
-  scores.push(score);
-  scores.sort((a,b)=>a-b);
-  scores=scores.slice(0,5);
-  localStorage.setItem("scores",JSON.stringify(scores));
-  loadScores();
-}
-
-function loadScores(){
-  let scores=JSON.parse(localStorage.getItem("scores")||"[]");
-  let html="<b>🏆 Leaderboard</b><br>";
-  scores.forEach((s,i)=>html+=`${i+1}. ${s} tries<br>`);
-  leaderboard.innerHTML=html;
-}
-loadScores();
-
-function showPopup(t){popupText.innerText=t;popup.style.display="flex";}
-function closePopup(){popup.style.display="none";resetGame();}
 </script>
 
 </body>
