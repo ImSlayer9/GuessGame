@@ -1,44 +1,32 @@
-🎯 Guess the Number Game
+🎯 Guess The Number — Interactive Web Game
+🚀 Overview
 
-A modern, interactive number guessing game built using HTML, CSS, and JavaScript.
-The player must guess a randomly generated number between 1 and 99 within a limited number of attempts.
+Guess The Number is a browser-based interactive game where users must identify a randomly generated number between 1 and 99 within 6 attempts.
 
-🚀 Features
-🎮 Interactive keypad-based input
-🔢 Random number generation (1–99)
-❌ Limited attempts (6 chances)
-🔼 Smart feedback ("Too High" / "Too Low")
-🎉 Win/Lose popup with ranking system
-✨ Smooth UI animations and effects
-🔁 Reset and replay functionality
-🧠 How It Works
-The game generates a random number between 1 and 99
-Player enters guesses using the on-screen keypad
-After each guess:
-Feedback is shown (Too High / Too Low)
-Attempt is recorded
-The player wins if they guess correctly within 6 attempts
-If all attempts are used, the correct number is revealed
-🛠️ Tech Stack
-HTML5 – Structure
-CSS3 – Styling & Animations
-JavaScript (Vanilla JS) – Game Logic
-📂 Project Structure
-guess-the-number/
-│── index.html
-│── README.md
-▶️ Getting Started
-1. Clone the repository
-git clone https://github.com/your-username/guess-the-number.git
-2. Open the project
+The project focuses on:
 
-Simply open index.html in your browser.
+Clean UI design
+Smooth animations
+Real-time feedback logic
+Engaging user interaction
 
-🎯 Game Rules
-You have 6 chances to guess the number
-Enter a number between 1 and 99
-Use logic based on feedback to reach the correct answer
-Fewer attempts = better rank
+✨ Features
+🎮 Interactive keypad input system
+🎯 Random number generation (1–99)
+🔁 Limited attempts (6 chances)
+📊 Smart feedback system (Too High / Too Low)
+🎉 Animated win/lose popups
+🏆 Rank system based on performance
+🌌 Modern neon UI with animations
+
+🧠 Game Logic
+User Input → Validate → Compare with Random Number
+        ↓
+  Correct → Win 🎉
+  Incorrect → Feedback (High / Low)
+        ↓
+Attempts exhausted → Game Over 💀
+
 🏆 Ranking System
 Attempts	Rank
 1	Psychic 🔮
@@ -47,15 +35,46 @@ Attempts	Rank
 4	Solid Player ⚡
 5	Calculated Guess 😎
 6	Lucky Escape 😅
-💡 Future Improvements
-Difficulty levels (Easy / Medium / Hard)
+
+🛠️ Tech Stack
+Layer	Technology
+Structure	HTML5
+Styling	CSS3 (Animations + Glass UI)
+Logic	Vanilla JavaScript
+📂 Project Structure
+guess-the-number/
+│── index.html
+│── README.md
+
+▶️ Getting Started
+Clone the repository
+git clone https://github.com/your-username/guess-the-number.git
+Run locally
+
+Open index.html in your browser.
+
+🌐 Live Demo 
+
+https://imslayer9.github.io/GuessGame/
+
+🎯 Key Highlights (Portfolio Value)
+Clean separation of UI and logic
+Strong use of DOM manipulation
+Interactive UX without external libraries
+Animation-driven feedback system
+Beginner-to-intermediate level JavaScript project
+🔮 Future Enhancements
+Difficulty modes (Easy / Medium / Hard)
 Timer-based gameplay ⏱️
 Sound effects 🔊
-Leaderboard system 📊
+Global leaderboard 🌍
+Mobile optimization 📱
+
 📄 License
 
-This project is open-source and available under the MIT License.
+This project is licensed under the MIT License.
 
-🙌 Acknowledgements
+👨‍💻 Author
 
-Built as a fun project to practice JavaScript logic and UI interactions.
+Slayer
+Aspiring Software Developer
