@@ -168,7 +168,7 @@ h1 {
 .guesses,
 .chances {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
   margin-bottom: 9px;
 }
@@ -414,7 +414,7 @@ h1 {
 
   <div class="status-row">
     <span>Your guesses</span>
-    <span>7 tries</span>
+    <span>6 tries</span>
   </div>
 
   <div class="guesses" id="guesses"></div>
@@ -457,7 +457,7 @@ h1 {
 let number = Math.floor(Math.random() * 99) + 1;
 let input = "";
 let attempts = 0;
-let max = 7;
+let max = 6;
 
 for (let i = 0; i < max; i++) {
   chances.innerHTML += `<div class="box"></div>`;
